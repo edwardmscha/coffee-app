@@ -113,7 +113,7 @@ body {
     justify-content: center;
     padding: 120px 20px 80px;
     background-image: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8)), 
-                      url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=2072&q=80');
+                      url('https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -222,26 +222,40 @@ body {
     width: 100%;
     height: 250px;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .project-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     position: relative;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    filter: contrast(1.1) brightness(1.05);
 }
 
 .project-1 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-image: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=3000&q=100');
 }
 
 .project-2 {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=3000&q=100');
 }
 
 .project-3 {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=3000&q=100');
 }
 
 .project-content {
@@ -292,7 +306,7 @@ body {
 /* Contact 섹션 */
 .contact {
     padding: 100px 20px;
-    background: var(--bg-light);
+    background: #fefefe;
 }
 
 .contact-wrapper {
