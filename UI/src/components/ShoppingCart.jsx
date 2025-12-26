@@ -24,7 +24,7 @@ function ShoppingCart({ cartItems, onOrder }) {
           <div className="cart-items-section">
             <div className="cart-items">
               {cartItems.map((item, index) => (
-                <div key={index} className="cart-item">
+                <div key={`${item.menuId}-${JSON.stringify(item.selectedOptions)}-${index}`} className="cart-item">
                   <span className="item-name">{formatItemName(item)}</span>
                   <span className="item-quantity">X {item.quantity}</span>
                   <span className="item-price">{(item.price * item.quantity).toLocaleString()}원</span>

@@ -3,6 +3,7 @@ import './MenuCard.css';
 
 function MenuCard({ menu, onAddToCart }) {
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const [imageError, setImageError] = useState(false);
 
   const handleOptionChange = (optionId) => {
     setSelectedOptions(prev => {
@@ -38,15 +39,19 @@ function MenuCard({ menu, onAddToCart }) {
   return (
     <div className="menu-card">
       <div className="menu-image">
-        {menu.imageUrl ? (
-          <img src={menu.imageUrl} alt={menu.name} />
+        {menu.imageUrl && !imageError ? (
+          <img 
+            src={menu.imageUrl} 
+            alt={menu.name}
+            onError={() => setImageError(true)}
+          />
         ) : (
           <div className="image-placeholder">이미지</div>
         )}
       </div>
       <div className="menu-info">
         <h3 className="menu-name">{menu.name}</h3>
-        <p className="menu-price">{menu.price.toLocaleString()}원</p>
+        <p className="menu-price">{calculateTotalPrice().toLocaleString()}원</p>
         <p className="menu-description">{menu.description}</p>
       </div>
       <div className="menu-options">

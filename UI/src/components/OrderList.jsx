@@ -58,7 +58,7 @@ function OrderList({ orders, onStatusChange }) {
                     }
                     itemText += ` x ${item.quantity}`;
                     return (
-                      <div key={index} className="order-item-detail">
+                      <div key={`${order.orderId}-${item.menuId}-${index}`} className="order-item-detail">
                         {itemText}
                       </div>
                     );

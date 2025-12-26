@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Header from './components/Header';
 import MenuCard from './components/MenuCard';
 import ShoppingCart from './components/ShoppingCart';
