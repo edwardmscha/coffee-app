@@ -83,11 +83,15 @@ function App() {
   const [menus] = useState(initialMenus);
   const [cartItems, setCartItems] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [inventory, setInventory] = useState([
-    { menuId: 1, menuName: '아메리카노(ICE)', stock: 10 },
-    { menuId: 2, menuName: '아메리카노(HOT)', stock: 10 },
-    { menuId: 3, menuName: '카페라떼', stock: 10 }
-  ]);
+  
+  // 모든 메뉴에 대한 초기 재고 설정
+  const [inventory, setInventory] = useState(() => 
+    initialMenus.map(menu => ({
+      menuId: menu.id,
+      menuName: menu.name,
+      stock: 10
+    }))
+  );
 
   // 주문 통계 계산
   const dashboardStats = useMemo(() => {
@@ -127,6 +131,40 @@ function App() {
 
   const handleOrder = () => {
     if (cartItems.length === 0) return;
+    
+    // 재고 확인 및 차감
+    const updatedInventory = [...inventory];
+    let hasInsufficientStock = false;
+    const insufficientItems = [];
+
+    cartItems.forEach(cartItem => {
+      const inventoryItem = updatedInventory.find(item => item.menuId === cartItem.menuId);
+      if (inventoryItem) {
+        if (inventoryItem.stock < cartItem.quantity) {
+          hasInsufficientStock = true;
+          insufficientItems.push({
+            name: cartItem.menuName,
+            requested: cartItem.quantity,
+            available: inventoryItem.stock
+          });
+        } else {
+          // 재고 차감
+          inventoryItem.stock -= cartItem.quantity;
+        }
+      }
+    });
+
+    // 재고 부족 시 경고
+    if (hasInsufficientStock) {
+      const message = insufficientItems
+        .map(item => `${item.name}: 요청 ${item.requested}개, 재고 ${item.available}개`)
+        .join('\n');
+      alert(`재고가 부족합니다:\n${message}`);
+      return;
+    }
+
+    // 재고 업데이트
+    setInventory(updatedInventory);
     
     // 주문 생성
     const newOrder = {
@@ -190,7 +228,11 @@ function App() {
               ))}
             </div>
           </main>
-          <ShoppingCart cartItems={cartItems} onOrder={handleOrder} />
+          <ShoppingCart 
+            cartItems={cartItems} 
+            onOrder={handleOrder}
+            onCartUpdate={setCartItems}
+          />
         </>
       )}
       

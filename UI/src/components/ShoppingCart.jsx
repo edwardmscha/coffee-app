@@ -1,6 +1,6 @@
 import './ShoppingCart.css';
 
-function ShoppingCart({ cartItems, onOrder }) {
+function ShoppingCart({ cartItems, onOrder, onCartUpdate }) {
   const calculateTotal = () => {
     return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
@@ -14,6 +14,24 @@ function ShoppingCart({ cartItems, onOrder }) {
     return name;
   };
 
+  const handleRemoveItem = (index) => {
+    if (onCartUpdate) {
+      onCartUpdate(cartItems.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleQuantityChange = (index, change) => {
+    if (onCartUpdate) {
+      const updated = [...cartItems];
+      updated[index].quantity += change;
+      if (updated[index].quantity <= 0) {
+        handleRemoveItem(index);
+        return;
+      }
+      onCartUpdate(updated);
+    }
+  };
+
   return (
     <div className="shopping-cart">
       <h2 className="cart-title">장바구니</h2>
@@ -25,9 +43,34 @@ function ShoppingCart({ cartItems, onOrder }) {
             <div className="cart-items">
               {cartItems.map((item, index) => (
                 <div key={`${item.menuId}-${JSON.stringify(item.selectedOptions)}-${index}`} className="cart-item">
-                  <span className="item-name">{formatItemName(item)}</span>
-                  <span className="item-quantity">X {item.quantity}</span>
-                  <span className="item-price">{(item.price * item.quantity).toLocaleString()}원</span>
+                  <div className="cart-item-main">
+                    <span className="item-name">{formatItemName(item)}</span>
+                    <div className="item-quantity-controls">
+                      <button 
+                        className="quantity-btn" 
+                        onClick={() => handleQuantityChange(index, -1)}
+                        aria-label="수량 감소"
+                      >
+                        -
+                      </button>
+                      <span className="item-quantity">X {item.quantity}</span>
+                      <button 
+                        className="quantity-btn" 
+                        onClick={() => handleQuantityChange(index, 1)}
+                        aria-label="수량 증가"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <span className="item-price">{(item.price * item.quantity).toLocaleString()}원</span>
+                  </div>
+                  <button 
+                    className="remove-item-btn"
+                    onClick={() => handleRemoveItem(index)}
+                    aria-label="아이템 삭제"
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>

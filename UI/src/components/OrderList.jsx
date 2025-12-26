@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import './OrderList.css';
 
 function OrderList({ orders, onStatusChange }) {
+  const [filter, setFilter] = useState('all'); // all, received, in_progress, completed
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const month = date.getMonth() + 1;
@@ -35,14 +37,46 @@ function OrderList({ orders, onStatusChange }) {
     }
   };
 
+  const filteredOrders = filter === 'all' 
+    ? orders 
+    : orders.filter(order => order.status === filter);
+
   return (
     <div className="order-list">
-      <h2 className="order-list-title">주문 현황</h2>
-      {orders.length === 0 ? (
+      <div className="order-list-header">
+        <h2 className="order-list-title">주문 현황</h2>
+        <div className="order-filters">
+          <button
+            className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => setFilter('all')}
+          >
+            전체
+          </button>
+          <button
+            className={`filter-btn ${filter === 'received' ? 'active' : ''}`}
+            onClick={() => setFilter('received')}
+          >
+            주문 접수
+          </button>
+          <button
+            className={`filter-btn ${filter === 'in_progress' ? 'active' : ''}`}
+            onClick={() => setFilter('in_progress')}
+          >
+            제조 중
+          </button>
+          <button
+            className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
+            onClick={() => setFilter('completed')}
+          >
+            제조 완료
+          </button>
+        </div>
+      </div>
+      {filteredOrders.length === 0 ? (
         <p className="empty-orders">주문이 없습니다</p>
       ) : (
         <div className="orders">
-          {orders.map(order => (
+          {filteredOrders.map(order => (
             <div key={order.orderId} className="order-item">
               <div className="order-header">
                 <div className="order-time">{formatDate(order.orderTime)}</div>

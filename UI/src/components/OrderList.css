@@ -3,11 +3,49 @@
   background-color: #ffffff;
 }
 
+.order-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .order-list-title {
   font-size: 1.5rem;
   font-weight: bold;
-  margin: 0 0 1.5rem 0;
+  margin: 0;
   color: #1f2937;
+}
+
+.order-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.filter-btn.active {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
 }
 
 .empty-orders {
@@ -136,6 +174,19 @@
 @media (max-width: 768px) {
   .order-list {
     padding: 1rem;
+  }
+
+  .order-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-filters {
+    width: 100%;
+  }
+
+  .filter-btn {
+    flex: 1;
   }
 
   .order-content {
