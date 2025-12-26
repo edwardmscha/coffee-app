@@ -19,17 +19,12 @@
   margin: 0 auto;
 }
 
-.admin-placeholder {
+.admin-page {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.admin-placeholder h2 {
-  color: #6b7280;
-  font-size: 2rem;
+  flex-direction: column;
+  background-color: #f9fafb;
+  overflow-y: auto;
 }
 
 /* 반응형 디자인 */

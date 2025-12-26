@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import MenuCard from './components/MenuCard';
 import ShoppingCart from './components/ShoppingCart';
+import Dashboard from './components/Dashboard';
+import Inventory from './components/Inventory';
+import OrderList from './components/OrderList';
 import './App.css';
 
 // 임시 메뉴 데이터
@@ -79,6 +82,27 @@ function App() {
   const [currentPage, setCurrentPage] = useState('order');
   const [menus] = useState(initialMenus);
   const [cartItems, setCartItems] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [inventory, setInventory] = useState([
+    { menuId: 1, menuName: '아메리카노(ICE)', stock: 10 },
+    { menuId: 2, menuName: '아메리카노(HOT)', stock: 10 },
+    { menuId: 3, menuName: '카페라떼', stock: 10 }
+  ]);
+
+  // 주문 통계 계산
+  const dashboardStats = useMemo(() => {
+    const totalOrders = orders.length;
+    const receivedOrders = orders.filter(o => o.status === 'received').length;
+    const inProgressOrders = orders.filter(o => o.status === 'in_progress').length;
+    const completedOrders = orders.filter(o => o.status === 'completed').length;
+
+    return {
+      totalOrders,
+      receivedOrders,
+      inProgressOrders,
+      completedOrders
+    };
+  }, [orders]);
 
   const handleAddToCart = (item) => {
     setCartItems(prev => {
@@ -104,12 +128,49 @@ function App() {
   const handleOrder = () => {
     if (cartItems.length === 0) return;
     
-    // TODO: 서버에 주문 요청 보내기
-    console.log('주문하기:', cartItems);
+    // 주문 생성
+    const newOrder = {
+      orderId: Date.now(), // 임시 ID 생성
+      orderTime: new Date().toISOString(),
+      items: cartItems.map(item => ({
+        menuId: item.menuId,
+        menuName: item.menuName,
+        selectedOptions: item.selectedOptions,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      totalPrice: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+      status: 'received' // 초기 상태는 주문접수
+    };
+
+    setOrders(prev => [newOrder, ...prev]);
     alert('주문이 완료되었습니다!');
     
     // 장바구니 비우기
     setCartItems([]);
+  };
+
+  const handleStockUpdate = (menuId, change) => {
+    setInventory(prev => 
+      prev.map(item => {
+        if (item.menuId === menuId) {
+          const newStock = Math.max(0, item.stock + change);
+          return { ...item, stock: newStock };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleOrderStatusChange = (orderId, newStatus) => {
+    setOrders(prev =>
+      prev.map(order => {
+        if (order.orderId === orderId) {
+          return { ...order, status: newStatus };
+        }
+        return order;
+      })
+    );
   };
 
   return (
@@ -134,8 +195,10 @@ function App() {
       )}
       
       {currentPage === 'admin' && (
-        <div className="admin-placeholder">
-          <h2>관리자 화면 (추후 구현 예정)</h2>
+        <div className="admin-page">
+          <Dashboard stats={dashboardStats} />
+          <Inventory inventory={inventory} onStockUpdate={handleStockUpdate} />
+          <OrderList orders={orders} onStatusChange={handleOrderStatusChange} />
         </div>
       )}
     </div>
