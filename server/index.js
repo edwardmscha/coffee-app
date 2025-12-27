@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { testConnection } = require('./config/database');
+const { initDatabase } = require('./config/initDb');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,10 +17,10 @@ app.get('/', (req, res) => {
   res.json({ message: '커피 주문 앱 서버가 실행 중입니다.' });
 });
 
-// API 라우트 (추후 추가)
-// app.use('/api/menus', require('./routes/menus'));
-// app.use('/api/orders', require('./routes/orders'));
-// app.use('/api/admin', require('./routes/admin'));
+// API 라우트
+app.use('/api/menus', require('./routes/menus'));
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/admin', require('./routes/admin'));
 
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
@@ -42,13 +43,34 @@ const startServer = async () => {
   // 데이터베이스 연결 테스트
   const dbConnected = await testConnection();
   if (!dbConnected) {
-    console.log('⚠️  데이터베이스 연결 실패. 서버를 시작할 수 없습니다.');
-    process.exit(1);
+    console.log('⚠️  데이터베이스 연결 실패. 서버는 시작되지만 데이터베이스 기능은 사용할 수 없습니다.');
+    console.log('⚠️  데이터베이스 설정을 확인하고 재시작해주세요.');
+  } else {
+    // 데이터베이스 초기화 (테이블 생성 및 초기 데이터 삽입)
+    // 주의: 처음 한 번만 실행하거나, 개발 환경에서만 사용
+    if (process.env.INIT_DB === 'true') {
+      try {
+        await initDatabase();
+      } catch (error) {
+        console.error('데이터베이스 초기화 오류:', error);
+      }
+    }
   }
 
   app.listen(PORT, () => {
     console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
     console.log(`📍 http://localhost:${PORT}`);
+    if (dbConnected) {
+      console.log(`📝 API 엔드포인트:`);
+      console.log(`   - GET  /api/menus`);
+      console.log(`   - POST /api/orders`);
+      console.log(`   - GET  /api/orders/:orderId`);
+      console.log(`   - GET  /api/admin/inventory`);
+      console.log(`   - PUT  /api/admin/inventory/:menuId`);
+      console.log(`   - GET  /api/admin/orders`);
+      console.log(`   - PUT  /api/admin/orders/:orderId/status`);
+      console.log(`   - GET  /api/admin/dashboard`);
+    }
   });
 };
 

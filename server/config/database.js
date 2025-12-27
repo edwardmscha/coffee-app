@@ -19,8 +19,9 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  console.error('❌ PostgreSQL 데이터베이스 연결 오류:', err);
-  process.exit(-1);
+  console.error('❌ PostgreSQL 데이터베이스 연결 오류:', err.message);
+  // 프로세스를 종료하지 않고 계속 실행 (개발 환경에서 유용)
+  // process.exit(-1);
 });
 
 // 연결 테스트 함수

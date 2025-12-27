@@ -18,7 +18,7 @@ function OrderList({ orders, onStatusChange }) {
       return (
         <button
           className="order-status-btn start"
-          onClick={() => onStatusChange(order.orderId, 'in_progress')}
+          onClick={() => onStatusChange(order.id, 'in_progress')}
         >
           제조 시작
         </button>
@@ -27,7 +27,7 @@ function OrderList({ orders, onStatusChange }) {
       return (
         <button
           className="order-status-btn complete"
-          onClick={() => onStatusChange(order.orderId, 'completed')}
+          onClick={() => onStatusChange(order.id, 'completed')}
         >
           제조 완료
         </button>
@@ -77,7 +77,7 @@ function OrderList({ orders, onStatusChange }) {
       ) : (
         <div className="orders">
           {filteredOrders.map(order => (
-            <div key={order.orderId} className="order-item">
+            <div key={order.id} className="order-item">
               <div className="order-header">
                 <div className="order-time">{formatDate(order.orderTime)}</div>
                 <div className="order-price">{order.totalPrice.toLocaleString()}원</div>
@@ -87,12 +87,12 @@ function OrderList({ orders, onStatusChange }) {
                   {order.items.map((item, index) => {
                     let itemText = item.menuName;
                     if (item.selectedOptions && item.selectedOptions.length > 0) {
-                      const optionNames = item.selectedOptions.map(opt => opt.name).join(', ');
+                      const optionNames = item.selectedOptions.map(opt => opt.optionName).join(', ');
                       itemText += ` (${optionNames})`;
                     }
                     itemText += ` x ${item.quantity}`;
                     return (
-                      <div key={`${order.orderId}-${item.menuId}-${index}`} className="order-item-detail">
+                      <div key={`${order.id}-${item.menuId}-${index}`} className="order-item-detail">
                         {itemText}
                       </div>
                     );

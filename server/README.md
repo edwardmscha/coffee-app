@@ -10,14 +10,31 @@ npm install
 ```
 
 ### 개발 모드로 실행
+
+#### 방법 1: 자동 스크립트 사용 (권장)
 ```bash
+./start.sh              # 일반 시작
+./start.sh --init       # 데이터베이스 초기화와 함께 시작
+```
+
+#### 방법 2: npm 명령어 사용
+```bash
+# PostgreSQL PATH 추가 (한 번만)
+export PATH="/Library/PostgreSQL/18/bin:$PATH"
+
+# 서버 시작
 npm run dev
+
+# 데이터베이스 초기화와 함께 시작
+INIT_DB=true npm run dev
 ```
 
 ### 프로덕션 모드로 실행
 ```bash
 npm start
 ```
+
+**자세한 내용은 `TERMINAL_GUIDE.md` 파일을 참고하세요.**
 
 ## 환경 변수
 
