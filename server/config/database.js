@@ -7,6 +7,10 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'coffee_order_db',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD,
+  // SSL 설정: 프로덕션 환경(Render 등)에서는 SSL 필수
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false // Render PostgreSQL의 경우 자체 서명 인증서 사용
+  } : false,
   // 연결 풀 설정
   max: 20, // 최대 연결 수
   idleTimeoutMillis: 30000, // 유휴 연결 타임아웃
