@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+// API 기본 URL 설정
+// 개발 환경: 로컬 서버
+// 프로덕션 환경: 환경 변수에서 가져오거나 기본값 사용
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 // 공통 fetch 함수
 const fetchAPI = async (endpoint, options = {}) => {
@@ -30,7 +33,7 @@ const fetchAPI = async (endpoint, options = {}) => {
   } catch (error) {
     // 네트워크 오류인 경우 (서버가 실행되지 않았거나 연결 불가)
     if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.message.includes('Load failed'))) {
-      const networkError = new Error('서버에 연결할 수 없습니다. 백엔드 서버(http://localhost:3001)가 실행 중인지 확인해주세요.');
+      const networkError = new Error('서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
       networkError.isNetworkError = true;
       throw networkError;
     }
@@ -72,4 +75,3 @@ export const updateOrderStatus = (orderId, status) =>
   });
 
 export const getDashboard = () => fetchAPI('/admin/dashboard');
-

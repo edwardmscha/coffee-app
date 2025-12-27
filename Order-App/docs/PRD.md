@@ -202,6 +202,67 @@
 }
 ```
 
+## 5. 백엔드 PRD
+
+### 5.1 데이터 모델
+- **Menu**
+  - id (PK), name, description, price, imageUrl, stock
+  - 관계: Menu (1) - Options (N)
+- **Options**
+  - id (PK), menuId (FK), name, additionalPrice
+  - 관계: Options (N) - Menu (1)
+- **Orders**
+  - id (PK), createdAt, totalPrice, status (`received`, `in_progress`, `completed`)
+  - orderItems: [{ menuId, menuName, quantity, price, selectedOptions: [optionName], lineTotal }]
+
+### 5.2 사용자 흐름에 따른 데이터 스키마 사용
+1. **메뉴 조회**
+   - `Menu` 전체를 조회해 주문하기 화면에 표시
+   - `stock`은 관리자 화면에도 표시 (재고 상태 판단: 정상/주의/품절)
+2. **장바구니 담기**
+   - 프런트에서 Menu + Options를 조합해 장바구니에 표시 (백엔드 저장 없음)
+3. **주문 생성**
+   - 장바구니 → 주문하기 클릭 시 `Orders`에 저장
+   - 주문 레코드: 주문 시간(createdAt), 주문 항목(메뉴, 수량, 옵션, 금액), 총액, 초기 상태 `received`
+   - 주문 생성 시 해당 `Menu.stock`을 수량만큼 차감 (재고 부족 시 400 에러)
+4. **주문 현황 표시**
+   - `Orders` 데이터를 관리자 화면 “주문 현황”에 표시
+   - 상태 흐름: `received` → `in_progress` → `completed`
+
+### 5.3 API 설계
+- **메뉴 조회**
+  - `GET /api/menus`
+  - 응답: 메뉴 + 옵션 + 재고
+- **주문 생성**
+  - `POST /api/orders`
+  - 요청: { items: [{ menuId, quantity, selectedOptionIds: [] }] }
+  - 처리: 재고 검증 및 차감 → 주문 저장 → 생성된 주문 반환
+- **재고 업데이트 (관리자)**
+  - `PUT /api/admin/inventory/:menuId`
+  - 요청: { change: number } (증가/감소)
+  - 응답: 업데이트된 재고
+- **주문 상세 조회**
+  - `GET /api/orders/:orderId`
+  - 응답: 주문 시간, 상태, 항목(메뉴/수량/옵션/금액), 총액
+- **주문 상태 변경 (관리자)**
+  - `PUT /api/admin/orders/:orderId/status`
+  - 요청: { status: 'received' | 'in_progress' | 'completed' }
+  - 응답: 변경된 주문
+
+### 5.4 유효성 및 예외 처리
+- 주문 생성 시:
+  - 재고 부족: 400 반환, 부족한 메뉴명과 남은 재고 포함
+  - 잘못된 메뉴/옵션 ID: 400 반환
+- 재고 업데이트 시:
+  - 재고가 0 미만이 되지 않도록 서버에서 방어
+- 상태 변경 시:
+  - 허용된 상태 전이(`received`→`in_progress`→`completed`)만 허용
+
+### 5.5 추가 고려사항
+- 트랜잭션: 주문 생성 시 주문 레코드 삽입과 재고 차감을 단일 트랜잭션으로 처리
+- 인덱스: `Menu.id`, `Options.menuId`, `Orders.createdAt`, `Orders.status`
+- 응답 성능: 관리자 화면을 위해 `GET /api/orders?status=`로 상태별 필터링 지원
+
 ### 4.2 관리자 화면
 
 #### 4.2.1 화면 구성

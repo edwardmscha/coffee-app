@@ -7,6 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "init-db": "node scripts/init-db.js",
+    "init-prod-db": "INIT_DB=true node scripts/init-production-db.js",
+    "create-schema": "node scripts/create-schema.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

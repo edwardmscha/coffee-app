@@ -8,7 +8,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // 미들웨어
-app.use(cors());
+// CORS 설정: 프로덕션에서는 특정 도메인만 허용하는 것을 권장
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
