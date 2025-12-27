@@ -3,10 +3,16 @@
 // 프로덕션 환경: 환경 변수에서 가져오거나 기본값 사용
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
+// 디버깅: API URL 확인
+console.log('API_BASE_URL:', API_BASE_URL);
+
 // 공통 fetch 함수
 const fetchAPI = async (endpoint, options = {}) => {
+  const fullUrl = `${API_BASE_URL}${endpoint}`;
+  console.log('API 호출:', fullUrl);
+  
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(fullUrl, {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -29,15 +35,26 @@ const fetchAPI = async (endpoint, options = {}) => {
       throw error;
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('API 응답 성공:', endpoint, data);
+    return data;
   } catch (error) {
     // 네트워크 오류인 경우 (서버가 실행되지 않았거나 연결 불가)
     if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.message.includes('Load failed'))) {
-      const networkError = new Error('서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+      console.error('네트워크 오류:', {
+        url: fullUrl,
+        error: error.message,
+        apiBaseUrl: API_BASE_URL
+      });
+      const networkError = new Error(`서버에 연결할 수 없습니다. 백엔드 서버(${API_BASE_URL})가 실행 중인지 확인해주세요.`);
       networkError.isNetworkError = true;
       throw networkError;
     }
-    console.error('API 호출 오류:', error);
+    console.error('API 호출 오류:', {
+      url: fullUrl,
+      error: error.message,
+      status: error.status
+    });
     throw error;
   }
 };

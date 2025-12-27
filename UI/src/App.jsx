@@ -29,37 +29,41 @@ function App() {
     completedOrders: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // 메뉴 목록 불러오기
-  useEffect(() => {
-    const loadMenus = async () => {
-      try {
-        const data = await getMenus();
-        setMenus(data.menus || []);
-        setLoading(false);
-      } catch (error) {
-        console.error('메뉴 로드 오류:', error);
-        let errorMessage = '메뉴를 불러오는 중 오류가 발생했습니다.';
-        
-        // 오류 메시지에서 실제 내용 추출
-        const errorMsg = error.message || error.toString();
-        
-        if (error.isNetworkError || errorMsg.includes('서버에 연결') || errorMsg.includes('fetch')) {
-          errorMessage = '서버에 연결할 수 없습니다. 백엔드 서버(http://localhost:3001)가 실행 중인지 확인해주세요.';
-        } else if (error.status === 503 || errorMsg.includes('데이터베이스') || errorMsg.includes('데이터베이스 연결')) {
-          errorMessage = '데이터베이스 연결 오류가 발생했습니다.\n\n해결 방법:\n1. PostgreSQL.app 실행\n2. Tools > Query Tool에서 다음 SQL 실행:\n   ALTER USER postgres PASSWORD \'Edwardsu486!\';\n   CREATE DATABASE coffee_order_db;\n3. 서버 재시작';
-        } else if (errorMsg.includes('Load failed')) {
-          errorMessage = '서버 요청이 실패했습니다. 백엔드 서버가 실행 중인지 확인해주세요.';
-        } else {
-          errorMessage = `메뉴를 불러오는 중 오류: ${errorMsg}`;
-        }
-        
-        console.error('상세 오류 정보:', error);
-        alert(errorMessage);
-        setMenus([]);
-        setLoading(false);
+  const loadMenus = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await getMenus();
+      setMenus(data.menus || []);
+      setLoading(false);
+    } catch (error) {
+      console.error('메뉴 로드 오류:', error);
+      let errorMessage = '메뉴를 불러오는 중 오류가 발생했습니다.';
+      
+      // 오류 메시지에서 실제 내용 추출
+      const errorMsg = error.message || error.toString();
+      
+      if (error.isNetworkError || errorMsg.includes('서버에 연결') || errorMsg.includes('fetch')) {
+        errorMessage = '서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.';
+      } else if (error.status === 503 || errorMsg.includes('데이터베이스') || errorMsg.includes('데이터베이스 연결')) {
+        errorMessage = '데이터베이스 연결 오류가 발생했습니다.';
+      } else if (errorMsg.includes('Load failed')) {
+        errorMessage = '서버 요청이 실패했습니다. 백엔드 서버가 실행 중인지 확인해주세요.';
+      } else {
+        errorMessage = `메뉴를 불러오는 중 오류: ${errorMsg}`;
       }
-    };
+      
+      console.error('상세 오류 정보:', error);
+      setError(errorMessage);
+      setMenus([]);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadMenus();
   }, []);
 
@@ -191,6 +195,29 @@ function App() {
           <main className="main-content">
             {loading ? (
               <div style={{ textAlign: 'center', padding: '2rem' }}>메뉴를 불러오는 중...</div>
+            ) : error || menus.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#666' }}>
+                  {error || '메뉴를 불러올 수 없습니다.'}
+                </p>
+                <p style={{ color: '#999', marginBottom: '1rem' }}>
+                  백엔드 서버가 실행 중인지 확인해주세요.
+                </p>
+                <button 
+                  onClick={loadMenus}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '1rem'
+                  }}
+                >
+                  다시 시도
+                </button>
+              </div>
             ) : (
               <div className="menu-grid">
                 {menus.map(menu => (
